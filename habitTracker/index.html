@@ -532,8 +532,8 @@
             </div>
             <div class="text-right flex flex-col items-end gap-5">
                 <div class="flex gap-3">
-    <button onclick="launchWrapped()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-4 py-1 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center gap-2 animate-pulse" data-html2canvas-ignore="true">
-        <span>🎁</span> <span class="text-sm">2025 Wrapped</span>
+    <button id="wrapped-btn" style="display: none;" onclick="launchWrapped()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-4 py-1 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center gap-2 animate-pulse" data-html2canvas-ignore="true">
+        <span>🎁</span> <span class="text-sm">Year Wrapped</span>
     </button>
 
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode" data-html2canvas-ignore="true">
@@ -680,8 +680,8 @@
         const overlay = document.getElementById('overlay');
         const themeIcon = document.getElementById('theme-icon');
 
-        const START_YEAR = 2025; // UPDATED YEAR
-        const START_MONTH = 10;
+        const START_YEAR = 2026; // STARTING FROM 2026 AS REQUESTED
+        const START_MONTH = 0;
 
         let currentActiveKey = "";
         let appData = {};
@@ -733,10 +733,33 @@
             }
         }
 
+        // --- WRAPPED VISIBILITY CHECKER ---
+        function checkWrappedVisibility() {
+            const now = new Date();
+            const month = now.getMonth(); // 0 = Jan, 11 = Dec
+            const date = now.getDate();
+
+            // Show only if Month is December (11) AND Date is 30th or later
+            if (month === 11 && date >= 30) {
+                const btn = document.getElementById('wrapped-btn');
+                if (btn) {
+                    btn.style.display = 'flex'; // Make it visible again
+                    
+                    // Update text to current year
+                    const yearSpan = btn.querySelector('.text-sm');
+                    if(yearSpan) yearSpan.innerText = `${now.getFullYear()} Wrapped`;
+                }
+            }
+        }
+
         function initApp() {
             loadGoogleFonts();
             loadTheme();
             loadFromStorage();
+            
+            // Trigger Visibility Check
+            checkWrappedVisibility();
+
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
@@ -1109,9 +1132,8 @@ let wrappedData = {};
 const TOTAL_SLIDES = 5;
 
 function launchWrapped() {
-    // 1. Gather Data for Current Year (e.g. 2025)
-    // Note: We use the year from the period text or default to 2025
-    const year = 2025; 
+    // UPDATED: Use current system year dynamically
+    const year = new Date().getFullYear(); 
     
     let totalChecks = 0;
     let habitCounts = {}; 
@@ -1245,7 +1267,7 @@ function renderSlide(index) {
             <div class="wrapped-slide" id="wrapped-capture-area">
                 <div class="bg-gray-900 border border-gray-700 p-8 rounded-2xl shadow-2xl w-full max-w-sm transform rotate-1 hover:rotate-0 transition-transform duration-500">
                     <div class="flex justify-between items-center mb-6">
-                         <span class="font-black text-xl text-white">2025 WRAPPED</span>
+                         <span class="font-black text-xl text-white">${wrappedData.year} WRAPPED</span>
                          <span class="text-2xl">🏆</span>
                     </div>
                     <div class="space-y-4 text-left">
